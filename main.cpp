@@ -231,24 +231,13 @@ void wczytajKsiazkeAdresowa (vector<Kontakt>& kontakty, vector<Kontakt>& kontakt
                 daneKontaktowe.id = atoi(daneKontaktoweStr.c_str());
                 liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku+1);
 
-                if (daneKontaktoweStr.length() == 1) {  //dla kazdego rzedu wielkosci. Inaczej ucina litery z przodu imienia zgodnie z rzedem wielkosci x10.
-                    daneKontaktoweStr = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
-                    daneKontaktowe.idUzytkownika = atoi(daneKontaktoweStr.c_str());
-                    liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku+1);
+                daneKontaktoweStr = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
+                daneKontaktowe.idUzytkownika = atoi(daneKontaktoweStr.c_str());
+                liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku);
 
-                    separatorDanychWPliku = liniaZKsiazkiAdresowej.find('|');
-                    daneKontaktowe.imie = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
-                    liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku+1);
-                }
-                if (daneKontaktoweStr.length() == 2) {
-                    daneKontaktoweStr = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
-                    daneKontaktowe.idUzytkownika = atoi(daneKontaktoweStr.c_str());
-                    liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku);
-
-                    separatorDanychWPliku = liniaZKsiazkiAdresowej.find('|');
-                    daneKontaktowe.imie = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
-                    liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku+1);
-                }
+                separatorDanychWPliku = liniaZKsiazkiAdresowej.find('|');
+                daneKontaktowe.imie = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
+                liniaZKsiazkiAdresowej = liniaZKsiazkiAdresowej.erase(0, separatorDanychWPliku+1);
 
                 separatorDanychWPliku = liniaZKsiazkiAdresowej.find('|');
                 daneKontaktowe.nazwisko = liniaZKsiazkiAdresowej.substr(0, separatorDanychWPliku);
@@ -279,8 +268,8 @@ void wczytajKsiazkeAdresowa (vector<Kontakt>& kontakty, vector<Kontakt>& kontakt
 
 void dodajKontaktDoPliku (Kontakt daneKontaktowe) {
     fstream ksiazkaAdresowa;
-    ksiazkaAdresowa.open("Ksiazka_Adresowa.txt", ios::out | ios::app | ios::ate);
-    if(ksiazkaAdresowa.good()==true) {
+    ksiazkaAdresowa.open("Ksiazka_Adresowa.txt", ios::out | ios::app);
+    if(ksiazkaAdresowa.good() == true) {
         ksiazkaAdresowa << daneKontaktowe.id << "|";
         ksiazkaAdresowa << daneKontaktowe.idUzytkownika << "|";
         ksiazkaAdresowa << daneKontaktowe.imie << "|";
@@ -311,11 +300,7 @@ int dodajKontakt (vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowane
 
     liczbaKontaktow++;
 
-    if (kontaktyZalogowanegoUzytkownika.size() == 0){
-        daneKontaktowe.id = liczbaKontaktow;
-    } else {
-        daneKontaktowe.id = kontakty.back().id + 1;
-    }
+    daneKontaktowe.id = kontakty.back().id + 1;
 
     kontaktyZalogowanegoUzytkownika.push_back(daneKontaktowe);
     kontakty.push_back(daneKontaktowe);
@@ -389,8 +374,7 @@ void wyswietlListeWszystkichKontaktow (vector<Kontakt>& kontaktyZalogowanegoUzyt
     system ("pause");
 }
 
-//Korzystalem z tej funkcji ale dodaje puste wiersze w pliku wiec sprobowalem zrobic to na wektorze w funkcji ponizej o tej samej nazwie.
-/*void uaktualnijKsiazkeAdresowaPoEdycji (vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowanegoUzytkownika, int idKontaktu) {
+void uaktualnijKsiazkeAdresowaPoEdycji (vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowanegoUzytkownika, int idKontaktu) {
 
     fstream ksiazkaAdresowa;
     fstream ksiazkaAdresowaTymczasowa;
@@ -398,11 +382,10 @@ void wyswietlListeWszystkichKontaktow (vector<Kontakt>& kontaktyZalogowanegoUzyt
     int idZKsiazki = 0;
 
     ksiazkaAdresowa.open("Ksiazka_Adresowa.txt", ios::in);
-    ksiazkaAdresowaTymczasowa.open("Ksiazka_adresowa_tymczasowa.txt", ios::out | ios::ate);
+    ksiazkaAdresowaTymczasowa.open("Ksiazka_adresowa_tymczasowa.txt", ios::out);
     if(ksiazkaAdresowa.good() == true && ksiazkaAdresowaTymczasowa.good() == true) {
-        while(!ksiazkaAdresowa.eof()) {
+        while(getline(ksiazkaAdresowa, liniaZKsiazkiAdresowej)) {
 
-            getline (ksiazkaAdresowa, liniaZKsiazkiAdresowej);
             if (liniaZKsiazkiAdresowej.find('|') != string::npos) {
                 size_t separatorDanychWPliku = liniaZKsiazkiAdresowej.find('|');
 
@@ -412,7 +395,7 @@ void wyswietlListeWszystkichKontaktow (vector<Kontakt>& kontaktyZalogowanegoUzyt
             if (idZKsiazki != idKontaktu) {
                 ksiazkaAdresowaTymczasowa << liniaZKsiazkiAdresowej << endl;
             } else {
-                for (int i = 0; i < (int) kontakty.size(); i++) {
+                for (int i = 0; i < (int) kontaktyZalogowanegoUzytkownika.size(); i++) {
                     if (kontaktyZalogowanegoUzytkownika[i].id == idKontaktu) {
                         ksiazkaAdresowaTymczasowa << kontaktyZalogowanegoUzytkownika[i].id << "|";
                         ksiazkaAdresowaTymczasowa << kontaktyZalogowanegoUzytkownika[i].idUzytkownika << "|";
@@ -427,30 +410,6 @@ void wyswietlListeWszystkichKontaktow (vector<Kontakt>& kontaktyZalogowanegoUzyt
         }
     }
     ksiazkaAdresowa.close();
-    ksiazkaAdresowaTymczasowa.close();
-    remove("Ksiazka_Adresowa.txt");
-    rename("Ksiazka_adresowa_tymczasowa.txt", "Ksiazka_Adresowa.txt");
-}*/
-
-void uaktualnijKsiazkeAdresowaPoEdycji (vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowanegoUzytkownika, int idKontaktu) {
-
-    fstream ksiazkaAdresowa;
-    fstream ksiazkaAdresowaTymczasowa;
-    string liniaZKsiazkiAdresowej = "", daneKontaktoweStr = "";
-
-    ksiazkaAdresowaTymczasowa.open("Ksiazka_adresowa_tymczasowa.txt", ios::out | ios::ate);
-    if(ksiazkaAdresowaTymczasowa.good() == true) {
-
-        for (int i = 0; i < (int) kontakty.size(); i++) {
-            ksiazkaAdresowaTymczasowa << kontakty[i].id << "|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].idUzytkownika << "|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].imie << "|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].nazwisko <<"|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].numerTel << "|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].eMail << "|";
-            ksiazkaAdresowaTymczasowa << kontakty[i].adresZamieszkania << "|" << endl;
-        }
-    }
     ksiazkaAdresowaTymczasowa.close();
     remove("Ksiazka_Adresowa.txt");
     rename("Ksiazka_adresowa_tymczasowa.txt", "Ksiazka_Adresowa.txt");
@@ -488,7 +447,7 @@ void uaktualnijKsiazkeAdresowaPoUsunieciu (vector<Kontakt>& kontakty, vector<Kon
 
 void edytujImie (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontakt>& kontakty) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     string noweImie = "";
 
     cout << "Podaj id kontaktu do edycji imienia: ";
@@ -505,7 +464,6 @@ void edytujImie (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontak
                     cout << "Podaj nowe imie: ";
                     noweImie = wczytajLinie();
                     kontaktyZalogowanegoUzytkownika[i].imie = noweImie;
-                    kontakty[i].imie = noweImie;
                 }
             }
             uaktualnijKsiazkeAdresowaPoEdycji(kontakty, kontaktyZalogowanegoUzytkownika, idKontaktu);
@@ -516,7 +474,7 @@ void edytujImie (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontak
 
 void edytujNazwisko (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontakt>& kontakty) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     string noweNazwisko = "";
 
     cout << "Podaj id kontaktu do edycji nazwiska: ";
@@ -530,7 +488,6 @@ void edytujNazwisko (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Ko
             for (int i = 0; i < (int) kontaktyZalogowanegoUzytkownika.size(); i++) {
 
                 if (kontaktyZalogowanegoUzytkownika[i].id == idKontaktu) {
-
                     cout << "Podaj nowe nazwisko: ";
                     noweNazwisko = wczytajLinie();
                     kontaktyZalogowanegoUzytkownika[i].nazwisko = noweNazwisko;
@@ -544,7 +501,7 @@ void edytujNazwisko (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Ko
 
 void edytujNumerTel (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontakt>& kontakty) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     string nowyNumerTel = "";
 
     cout << "Podaj id kontaktu do edycji numeru telefonu: ";
@@ -558,7 +515,6 @@ void edytujNumerTel (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Ko
             for (int i = 0; i < (int) kontaktyZalogowanegoUzytkownika.size(); i++) {
 
                 if (kontaktyZalogowanegoUzytkownika[i].id == idKontaktu) {
-
                     cout << "Podaj nowy numer telefonu: ";
                     nowyNumerTel = wczytajLinie();
                     kontaktyZalogowanegoUzytkownika[i].numerTel = nowyNumerTel;
@@ -572,7 +528,7 @@ void edytujNumerTel (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Ko
 
 void edytujEMail (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontakt>& kontakty) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     string nowyEMail = "";
 
     cout << "Podaj id kontaktu do edycji adresu e-mail: ";
@@ -586,9 +542,8 @@ void edytujEMail (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Konta
             for (int i = 0; i < (int) kontaktyZalogowanegoUzytkownika.size(); i++) {
 
                 if (kontaktyZalogowanegoUzytkownika[i].id == idKontaktu) {
-
                     cout << "Podaj nowy adres e-mail: ";
-                    cin >> nowyEMail;
+                    nowyEMail = wczytajLinie();
                     kontaktyZalogowanegoUzytkownika[i].eMail = nowyEMail;
                 }
             }
@@ -600,7 +555,7 @@ void edytujEMail (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Konta
 
 void edytujAdresZamieszkania (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, vector<Kontakt>& kontakty) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     string nowyAdresZamieszkania = "";
 
     cout << "Podaj id kontaktu do edycji adresu zamieszkania: ";
@@ -614,7 +569,6 @@ void edytujAdresZamieszkania (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, 
             for (int i = 0; i < (int) kontaktyZalogowanegoUzytkownika.size(); i++) {
 
                 if (kontaktyZalogowanegoUzytkownika[i].id == idKontaktu) {
-
                     cout << "Podaj nowy adres zamieszkania: ";
                     nowyAdresZamieszkania = wczytajLinie();
                     kontaktyZalogowanegoUzytkownika[i].adresZamieszkania = nowyAdresZamieszkania;
@@ -628,7 +582,7 @@ void edytujAdresZamieszkania (vector<Kontakt>& kontaktyZalogowanegoUzytkownika, 
 
 void usunKontakt(vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowanegoUzytkownika, int &liczbaKontaktow) {
 
-    int idKontaktu;
+    int idKontaktu = 0;
     vector <Kontakt>::iterator it;
 
     cout << "Podaj id kontaktu, ktory chcesz skasowac: ";
@@ -662,7 +616,7 @@ void usunKontakt(vector<Kontakt>& kontakty, vector<Kontakt>& kontaktyZalogowaneg
     }
 }
 
-void wyswietlManuKsiazkiAdresowej (int idZalogowanegoUzytkownika, vector<Kontakt>& kontaktyZalogowanegoUzytkownika) {
+void wyswietlMenuKsiazkiAdresowej (int idZalogowanegoUzytkownika, vector<Kontakt>& kontaktyZalogowanegoUzytkownika) {
 
     system("cls");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
@@ -852,7 +806,7 @@ Menu_glowne:
         kontakty.erase(kontakty.begin(), kontakty.end());
         kontaktyZalogowanegoUzytkownika.erase(kontaktyZalogowanegoUzytkownika.begin(), kontaktyZalogowanegoUzytkownika.end());
         wczytajKsiazkeAdresowa (kontakty, kontaktyZalogowanegoUzytkownika, idZalogowanegoUzytkownika);
-        wyswietlManuKsiazkiAdresowej (idZalogowanegoUzytkownika, kontaktyZalogowanegoUzytkownika);
+        wyswietlMenuKsiazkiAdresowej (idZalogowanegoUzytkownika, kontaktyZalogowanegoUzytkownika);
 
         cin >> wybor;
 
